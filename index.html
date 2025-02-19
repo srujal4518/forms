@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Submit Data</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f9;
+      margin: 0;
+      padding: 0;
+    }
+    h1 {
+      text-align: center;
+      color: #333;
+      margin-top: 20px;
+    }
+    form {
+      max-width: 500px;
+      margin: 20px auto;
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+    label {
+      font-size: 1.1em;
+      margin-bottom: 8px;
+      display: block;
+    }
+    input, textarea {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 1em;
+    }
+    button {
+      padding: 12px 20px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-size: 1em;
+      cursor: pointer;
+      width: 100%;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+    .alert {
+      padding: 10px;
+      margin-top: 10px;
+      color: white;
+      border-radius: 4px;
+      display: none;
+      text-align: center;
+    }
+    .alert.success { background-color: #4CAF50; }
+    .alert.error { background-color: #f44336; }
+  </style>
+</head>
+<body>
+  <h1>Submit Your Details</h1>
+  <form id="submitForm">
+    <label for="name">Name:</label>
+    <input type="text" id="name" name="name" required>
+
+    <label for="email">Email:</label>
+    <input type="email" id="email" name="email" required>
+
+    <label for="message">Message:</label>
+    <textarea id="message" name="message" required></textarea>
+
+    <button type="submit">Submit</button>
+  </form>
+
+  <div id="alert" class="alert"></div>
+
+  <script>
+    document.getElementById("submitForm").addEventListener("submit", async function (event) {
+      event.preventDefault();
+
+      const name = document.getElementById("name").value;
+      const email = document.getElementById("email").value;
+      const message = document.getElementById("message").value;
+
+      try {
+        const response = await fetch("/submit", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ name, email, message }),
+        });
+
+        const result = await response.json();
+
+        const alertBox = document.getElementById("alert");
+        alertBox.style.display = "block";
+        alertBox.innerHTML = result.message;
+
+        if (result.success) {
+          alertBox.classList.add("success");
+          alertBox.classList.remove("error");
+          document.getElementById("submitForm").reset();
+        } else {
+          alertBox.classList.add("error");
+          alertBox.classList.remove("success");
+        }
+      } catch (error) {
+        console.error("❌ Error submitting form:", error);
+        const alertBox = document.getElementById("alert");
+        alertBox.style.display = "block";
+        alertBox.classList.add("error");
+        alertBox.innerHTML = "Server error. Try again!";
+      }
+    });
+  </script>
+</body>
+</html>
